@@ -10,7 +10,7 @@ from passlib.context import CryptContext
 
 from models.models import User
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt"])
 
 class AuthService:
     """Service for handling authentication."""

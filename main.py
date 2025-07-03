@@ -11,7 +11,7 @@ import secrets
 import hashlib
 from datetime import datetime
 import io
-from pydantic import BaseModel, Field, HttpUrl, validator
+from pydantic import BaseModel, Field, HttpUrl, field_validator
 """
 StupidBookmarks - A fast, minimalistic bookmark manager built with FastAPI and Tailwind CSS.
 
@@ -44,6 +44,21 @@ from services.auth_service import AuthService
 from services.api_service import APIService
 from services.export_service import BookmarkExportService
 import version
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan manager for the application."""
+    # Startup
+    init_db()
+    db = next(get_db())
+    try:
+        if not auth_service.get_user(db):
+            auth_service.create_default_user(db)
+    finally:
+        db.close()
+    yield
+    # Shutdown - nothing to do here for now
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -56,7 +71,8 @@ app = FastAPI(
     version=version.__version__,
     docs_url="/api/docs",
     redoc_url=None,
-    openapi_url="/api/openapi.json"
+    openapi_url="/api/openapi.json",
+    lifespan=lifespan
 )
 
 # Mount static files
@@ -72,14 +88,14 @@ class BookmarkCreateRequest(BaseModel):
     description: Optional[str] = Field("", description="Description of the bookmark")
     tags: Optional[str] = Field("", description="Comma or space separated list of tags")
     
-    @validator('url')
+    @field_validator('url')
     def validate_url(cls, v):
         if not v.startswith(('http://', 'https://')):
             return f"https://{v}"
         return v
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "url": "https://example.com",
                 "title": "Example Website",
@@ -95,7 +111,7 @@ class TagResponse(BaseModel):
     size: int
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "name": "python",
                 "color": "#3776AB",
@@ -114,7 +130,7 @@ class BookmarkResponse(BaseModel):
     updated_at: Optional[str] = None
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "id": 1,
                 "url": "https://example.com",
@@ -134,19 +150,6 @@ export_service = BookmarkExportService()
 
 # Security
 security = HTTPBearer(auto_error=False)
-
-@app.on_event("startup")
-async def startup():
-    """Initialize database and create default user if needed."""
-    init_db()
-    
-    # Create default admin user if none exists
-    db = next(get_db())
-    try:
-        if not auth_service.get_user(db):
-            auth_service.create_default_user(db)
-    finally:
-        db.close()
 
 @app.get("/", response_class=HTMLResponse)
 async def index(
