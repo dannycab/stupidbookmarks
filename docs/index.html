@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StupidBookmarks - A Fast, Minimalistic Bookmark Manager</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --color-primary: #3b82f6;
+            --color-primary-dark: #2563eb;
+            --color-accent: #f97316;
+            --color-bg: #f8fafc;
+            --color-bg-dark: #0f172a;
+            --color-text: #1e293b;
+            --color-text-dark: #e2e8f0;
+            --color-card: #ffffff;
+            --color-card-dark: #1e293b;
+            --color-border: #e2e8f0;
+            --color-border-dark: #334155;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        .dark {
+            background-color: var(--color-bg-dark);
+            color: var(--color-text-dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            padding: 3rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 640px;
+            margin: 0 auto 2rem;
+            opacity: 0.8;
+        }
+
+        .version-badge {
+            background-color: var(--color-accent);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--color-primary-dark);
+        }
+
+        .btn-outline {
+            border: 2px solid var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .dark .btn-outline {
+            border: 2px solid var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .dark .btn-outline:hover {
+            background-color: var(--color-primary);
+            color: white;
+        }
+
+        .btn i {
+            margin-right: 0.5rem;
+        }
+
+        section {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .section-title p {
+            font-size: 1.125rem;
+            max-width: 640px;
+            margin: 0 auto;
+            opacity: 0.8;
+        }
+
+        .card {
+            background-color: var(--color-card);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .dark .card {
+            background-color: var(--color-card-dark);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .card h3 i {
+            margin-right: 0.75rem;
+            color: var(--color-primary);
+        }
+
+        .card p {
+            opacity: 0.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-item {
+            padding: 1.5rem;
+            background-color: var(--color-card);
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .dark .feature-item {
+            background-color: var(--color-card-dark);
+        }
+
+        .feature-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 3rem;
+            height: 3rem;
+            background-color: rgba(59, 130, 246, 0.1);
+            border-radius: 0.375rem;
+            margin-bottom: 1.25rem;
+            color: var(--color-primary);
+        }
+
+        .dark .feature-icon {
+            background-color: rgba(59, 130, 246, 0.2);
+        }
+
+        .feature-icon i {
+            font-size: 1.5rem;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-desc {
+            color: var(--color-text);
+            opacity: 0.8;
+        }
+
+        .dark .feature-desc {
+            color: var(--color-text-dark);
+        }
+
+        .release-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .release-item {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        .release-image {
+            flex: 1;
+            max-width: 500px;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .release-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .release-content {
+            flex: 1;
+        }
+
+        .release-badge {
+            display: inline-block;
+            background-color: var(--color-accent);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .release-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .release-desc {
+            margin-bottom: 1.5rem;
+            opacity: 0.8;
+        }
+
+        .release-features {
+            margin-bottom: 1.5rem;
+        }
+
+        .release-features h4 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .release-features ul {
+            list-style-type: none;
+        }
+
+        .release-features li {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .release-features li::before {
+            content: "•";
+            color: var(--color-primary);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-right: 0.5rem;
+        }
+
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .tech-category h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--color-primary);
+        }
+
+        .tech-list {
+            list-style-type: none;
+        }
+
+        .tech-list li {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .tech-list li::before {
+            content: "•";
+            color: var(--color-primary);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-right: 0.5rem;
+        }
+
+        code {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+        }
+
+        .dark code {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+            font-family: monospace;
+        }
+
+        .dark pre {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        footer {
+            background-color: var(--color-card);
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 4rem;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .dark footer {
+            background-color: var(--color-card-dark);
+            border-top: 1px solid var(--color-border-dark);
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer-links {
+            margin: 1rem 0;
+        }
+
+        .footer-links a {
+            color: var(--color-primary);
+            text-decoration: none;
+            margin: 0 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--color-primary-dark);
+            text-decoration: underline;
+        }
+
+        .footer-note {
+            font-size: 0.875rem;
+            opacity: 0.7;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--color-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .vibe-badge {
+            display: inline-block;
+            background-color: #8b5cf6;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .section-title h2 {
+                font-size: 2rem;
+            }
+            .release-item {
+                flex-direction: column;
+            }
+            .release-image {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="version-badge">v0.0.2</div>
+            <h1>StupidBookmarks</h1>
+            <p>A fast, minimalistic bookmark manager built with FastAPI and Tailwind CSS</p>
+        </header>
+
+        <section class="hero">
+            <div class="vibe-badge">🎵 Vibe Coding Project</div>
+            <h1>Keep it simple, keep it fast, keep it stupid</h1>
+            <p>
+                StupidBookmarks is a minimalist, single-user bookmark manager that focuses on simplicity, speed, and a clean user experience. No bloat, just pure bookmark management with a modern dark/light interface.
+            </p>
+            <div class="buttons">
+                <a href="https://github.com/dannycab/stupidbookmarks" class="btn btn-primary">
+                    <i class="fab fa-github"></i> View on GitHub
+                </a>
+                <a href="https://github.com/dannycab/stupidbookmarks#quick-start" class="btn btn-outline">
+                    <i class="fas fa-rocket"></i> Quick Start
+                </a>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-title">
+                <h2>Version 0.0.2 Released</h2>
+                <p>Our latest release adds bookmark import/export and pagination!</p>
+            </div>
+
+            <div class="release-grid">
+                <div class="release-item">
+                    <div class="release-image">
+                        <img src="https://placehold.co/800x450/3b82f6/FFF?text=Netscape+Import/Export" alt="Netscape HTML Bookmarks Import/Export">
+                    </div>
+                    <div class="release-content">
+                        <div class="release-badge">New Feature</div>
+                        <h3 class="release-title">Netscape HTML Import/Export</h3>
+                        <p class="release-desc">
+                            StupidBookmarks now supports importing and exporting bookmarks in the widely-used Netscape HTML format, making migration from other browsers and bookmark managers a breeze.
+                        </p>
+                        <div class="release-features">
+                            <h4>What's New</h4>
+                            <ul>
+                                <li>Import bookmarks from standard Netscape HTML format</li>
+                                <li>Export all bookmarks to Netscape HTML format</li>
+                                <li>Progress indicators for import/export operations</li>
+                                <li>Tag preservation during import/export process</li>
+                                <li>"Delete All Bookmarks" feature with confirmation modal</li>
+                            </ul>
+                        </div>
+                        <a href="https://github.com/dannycab/stupidbookmarks/releases/tag/v0.0.2" class="btn btn-outline">
+                            <i class="fas fa-list"></i> View Full Release Notes
+                        </a>
+                    </div>
+                </div>
+
+                <div class="release-item">
+                    <div class="release-content">
+                        <div class="release-badge">Enhancement</div>
+                        <h3 class="release-title">Pagination Support</h3>
+                        <p class="release-desc">
+                            Browse through large bookmark collections with ease using our new pagination system. Pagination is consistently implemented across both main and tag-filtered views.
+                        </p>
+                        <div class="release-features">
+                            <h4>Improvements</h4>
+                            <ul>
+                                <li>Pagination controls on main bookmark view</li>
+                                <li>Consistent pagination for tag-filtered views</li>
+                                <li>Efficient SQL queries with limit and offset</li>
+                                <li>Visual indicators showing current page and total pages</li>
+                                <li>Fixed duplicate pagination controls</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="release-image">
+                        <img src="https://placehold.co/800x450/3b82f6/FFF?text=Pagination+Support" alt="Pagination Support">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-title">
+                <h2>Features</h2>
+                <p>Everything you need for bookmark management, nothing you don't</p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 class="feature-title">Lightning Fast</h3>
+                    <p class="feature-desc">Built with FastAPI for maximum performance and async processing.</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-moon"></i>
+                    </div>
+                    <h3 class="feature-title">Dark Mode</h3>
+                    <p class="feature-desc">Beautiful dark/light theme with system preference detection.</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h3 class="feature-title">REST API</h3>
+                    <p class="feature-desc">Full REST API with auto-generated OpenAPI documentation.</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-feather"></i>
+                    </div>
+                    <h3 class="feature-title">Minimalistic</h3>
+                    <p class="feature-desc">Clean interface focused on bookmarking, no unnecessary features.</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Responsive</h3>
+                    <p class="feature-desc">Works perfectly on desktop, tablet, and mobile devices.</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h3 class="feature-title">SQLite Database</h3>
+                    <p class="feature-desc">Lightweight, zero-config database for storing bookmarks and tags.</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-magic"></i>
+                    </div>
+                    <h3 class="feature-title">Smart Bookmarking</h3>
+                    <p class="feature-desc">Automatically fetch page titles when adding bookmarks by URL.</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h3 class="feature-title">Tag System</h3>
+                    <p class="feature-desc">Organize bookmarks with tags and visualize with a dynamic tag cloud.</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Import/Export</h3>
+                    <p class="feature-desc">Support for standard Netscape HTML bookmark format.</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Pagination</h3>
+                    <p class="feature-desc">Browse large bookmark collections with intuitive pagination controls.</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3 class="feature-title">API Keys</h3>
+                    <p class="feature-desc">Generate secure API keys for external access to your bookmarks.</p>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-simple"></i>
+                    </div>
+                    <h3 class="feature-title">Admin Dashboard</h3>
+                    <p class="feature-desc">Manage bookmarks, tags, password, and API keys from a simple dashboard.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-title">
+                <h2>Tech Stack</h2>
+                <p>Modern technologies for maximum performance</p>
+            </div>
+
+            <div class="tech-stack">
+                <div class="tech-category">
+                    <h3>Backend</h3>
+                    <ul class="tech-list">
+                        <li>FastAPI - Modern async Python web framework</li>
+                        <li>SQLAlchemy - Python SQL toolkit and ORM</li>
+                        <li>SQLite - Lightweight database</li>
+                        <li>Pydantic - Data validation</li>
+                        <li>Passlib - Password hashing</li>
+                    </ul>
+                </div>
+
+                <div class="tech-category">
+                    <h3>Frontend</h3>
+                    <ul class="tech-list">
+                        <li>Jinja2 - Template engine</li>
+                        <li>Tailwind CSS - Utility-first CSS framework</li>
+                        <li>Vanilla JavaScript - No heavy frameworks</li>
+                        <li>Dark Mode - System preference aware</li>
+                        <li>Responsive Design - Mobile-first approach</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-title">
+                <h2>Quick Start</h2>
+                <p>Get StupidBookmarks running in minutes</p>
+            </div>
+
+            <div class="card">
+                <pre><code>
+# Clone the repository
+git clone https://github.com/dannycab/stupidbookmarks.git
+cd stupidbookmarks
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the application
+python main.py
+
+# Open your browser to the bookmark manager
+open http://localhost:8000/
+
+# Login with default password: admin
+                </code></pre>
+
+                <p>It's that simple! After logging in with the default password (<code>admin</code>), you can start adding bookmarks right away.</p>
+
+                <div class="buttons" style="justify-content: flex-start;">
+                    <a href="https://github.com/dannycab/stupidbookmarks#quick-start" class="btn btn-primary">
+                        <i class="fas fa-rocket"></i> Full Installation Guide
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-title">
+                <h2>Vibe Coding Project</h2>
+                <p>What does this mean?</p>
+            </div>
+
+            <div class="card">
+                <p>StupidBookmarks is developed in a <strong>freeform, improvisational, and experimental style</strong>. It's about finding the joy in coding without rigid structures or processes.</p>
+
+                <p>Some key aspects of vibe coding:</p>
+
+                <ul class="tech-list">
+                    <li>Focus on creative expression and experimentation</li>
+                    <li>Iterative development driven by inspiration</li>
+                    <li>Prioritizing developer enjoyment and satisfaction</li>
+                    <li>Emphasizing simplicity and directness over complexity</li>
+                    <li>Building what feels right rather than what's "best practice"</li>
+                </ul>
+
+                <div class="vibe-badge">Important Note</div>
+                <p>No pull requests will be honored. If you have a feature request or bug, please <a href="https://github.com/dannycab/stupidbookmarks/issues">open an issue</a> and I'll vibe code it (maybe it works, maybe not). Thanks for understanding!</p>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <h3>StupidBookmarks</h3>
+                <p>A minimalistic bookmark manager for the modern web</p>
+                <div class="footer-links">
+                    <a href="https://github.com/dannycab/stupidbookmarks">GitHub</a>
+                    <a href="https://github.com/dannycab/stupidbookmarks#quick-start">Quick Start</a>
+                    <a href="https://github.com/dannycab/stupidbookmarks/issues">Issues</a>
+                </div>
+                <p class="footer-note">Keep it simple, keep it fast, keep it stupid</p>
+                <p class="footer-note" style="margin-top: 1rem;">Made with ❤️ in Michigan</p>
+            </div>
+        </div>
+    </footer>
+
+    <button class="theme-toggle" id="theme-toggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        // Check for saved theme preference or use preferred color scheme
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.body.classList.add('dark');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            // Toggle theme
+            document.body.classList.toggle('dark');
+            
+            // Update icon
+            if (document.body.classList.contains('dark')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+    </script>
+</body>
+</html>
