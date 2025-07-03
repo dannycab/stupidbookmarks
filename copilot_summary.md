@@ -289,14 +289,15 @@ uvicorn main:app --reload --port 8000
 ## Notes for AI Assistant
 
 **When asked to work on this project:**
-1. **Start with Issue #2 (API docs)** for quick value-add
-2. **Check existing code patterns** before implementing
-3. **Test both dark/light modes** for UI changes
-4. **Use service layer** for business logic
-5. **Follow FastAPI conventions** for new endpoints
-6. **Maintain StupidRSS aesthetic** for styling (now implemented)
-7. **Consider mobile responsiveness** for UI changes
-8. **Follow branch workflow** for feature development
+1. **Refer to agent_instructions.md** for comprehensive development guidelines
+2. **Start with Issue #2 (API docs)** for quick value-add
+3. **Check existing code patterns** before implementing
+4. **Test both dark/light modes** for UI changes
+5. **Use service layer** for business logic
+6. **Follow FastAPI conventions** for new endpoints
+7. **Maintain StupidRSS aesthetic** for styling (now implemented)
+8. **Consider mobile responsiveness** for UI changes
+9. **Follow branch workflow** for feature development
 
 **Key Files to Understand:**
 - `main.py`: All routes and FastAPI setup
