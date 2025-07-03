@@ -4,6 +4,12 @@
 
 **StupidBookmarks** is a fast, minimalistic single-user bookmark manager built with FastAPI and Tailwind CSS. It's part of the "Stupid Apps" suite (alongside StupidRSS) and follows a "vibe coding" philosophy - freeform, improvisational, and experimental development style.
 
+### Recent Updates
+- ✅ Completed Issues #3 and #4: Implemented StupidRSS-style colors and improved tag filter visibility
+- 🔄 Merged feature branch `feature/ui-improvements` into main
+- 🧹 Cleaned up branch structure by removing completed feature branch
+- 🎯 All UI styling improvements are now in the main codebase
+
 ### Key Features
 - 🔖 Single-user bookmark management with auto-title fetching
 - 🏷️ Tag-based organization with visual tag cloud
@@ -91,8 +97,8 @@ stupidbookmarks/
 **GitHub Issues Created:**
 1. **#1**: Export bookmarks to Netscape HTML format (Medium, 2-3hrs)
 2. **#2**: API documentation at /api/docs (High, 3-4hrs)
-3. **#3**: Add StupidRSS-style colors to links/buttons (Medium, 2-3hrs)
-4. **#4**: Fix active tag filter visibility in dark mode (High, 1-2hrs) ⭐ **EASIEST**
+3. ✅ **#3**: Add StupidRSS-style colors to links/buttons (Medium, 2-3hrs) **COMPLETED**
+4. ✅ **#4**: Fix active tag filter visibility in dark mode (High, 1-2hrs) **COMPLETED**
 5. **#5**: Tag autocomplete suggestions (Medium, 3-4hrs)
 
 **Technical Debt:**
@@ -208,11 +214,64 @@ uvicorn main:app --reload --port 8000
 - requests, beautifulsoup4 (title fetching)
 - python-multipart (form handling)
 
+## Development Tools & Improvements
+
+### Current Tooling
+- **Git**: Version control with feature branch workflow
+- **GitHub**: Issue tracking and project management
+- **GitHub CLI**: Command-line interface for GitHub operations
+- **VS Code**: Primary development environment
+- **GitHub Copilot**: AI-assisted development
+
+### Recommended Additions
+- **Pre-commit hooks**: For code quality checks and formatting
+  ```bash
+  pip install pre-commit
+  # Create .pre-commit-config.yaml with linters like black, flake8, isort
+  pre-commit install
+  ```
+
+- **Automated testing**: Implement pytest for API and service testing
+  ```bash
+  pip install pytest pytest-cov
+  # Create tests/ directory with test modules
+  pytest
+  ```
+
+- **Documentation generation**: Use FastAPI's built-in Swagger/OpenAPI for API docs
+  ```python
+  # In main.py, enable docs with:
+  app = FastAPI(
+      title="StupidBookmarks API",
+      description="API for bookmark management",
+      version="0.1.0",
+      docs_url="/api/docs",
+      redoc_url="/api/redoc"
+  )
+  ```
+
+- **CI/CD workflow**: Setup GitHub Actions for testing and deployment
+  ```yaml
+  # .github/workflows/python-app.yml
+  name: Python application
+  on: [push, pull_request]
+  jobs:
+    test:
+      runs-on: ubuntu-latest
+      steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.13
+      - run: pip install -r requirements.txt
+      - run: pytest
+  ```
+
 ## Future Roadmap
 
 ### Short Term (Current Issues)
-- Fix tag filter visibility (#4)
-- Add colorful button styling (#3)
+- ✅ Fix tag filter visibility (#4) [COMPLETED]
+- ✅ Add colorful button styling (#3) [COMPLETED]
 - Implement API documentation (#2)
 
 ### Medium Term
@@ -230,13 +289,14 @@ uvicorn main:app --reload --port 8000
 ## Notes for AI Assistant
 
 **When asked to work on this project:**
-1. **Start with Issue #4** for quick wins
+1. **Start with Issue #2 (API docs)** for quick value-add
 2. **Check existing code patterns** before implementing
 3. **Test both dark/light modes** for UI changes
 4. **Use service layer** for business logic
 5. **Follow FastAPI conventions** for new endpoints
-6. **Maintain StupidRSS aesthetic** for styling
+6. **Maintain StupidRSS aesthetic** for styling (now implemented)
 7. **Consider mobile responsiveness** for UI changes
+8. **Follow branch workflow** for feature development
 
 **Key Files to Understand:**
 - `main.py`: All routes and FastAPI setup
@@ -249,3 +309,50 @@ uvicorn main:app --reload --port 8000
 - Template response with request context
 - User authentication on protected routes
 - Database session management
+
+### Branch Management Workflow
+
+The project follows a feature branch workflow:
+
+1. **Create Feature Branch**: For each feature or issue, create a dedicated branch
+   ```bash
+   git checkout -b feature/issue-name
+   ```
+
+2. **Implement Changes**: Make commits on the feature branch until the feature is complete
+   ```bash
+   git add .
+   git commit -m "Descriptive message about changes"
+   ```
+
+3. **Push Feature Branch**: Push the feature branch to GitHub for tracking
+   ```bash
+   git push origin feature/issue-name
+   ```
+
+4. **Test Thoroughly**: Ensure all changes work as expected before merging
+
+5. **Merge to Main**: When feature is complete, merge to main branch
+   ```bash
+   git checkout main
+   git merge feature/issue-name
+   git push origin main
+   ```
+
+6. **Close Issues**: Update GitHub issues to mark them as complete
+   ```bash
+   gh issue close <issue-number> --comment "Implementation details" --reason completed
+   ```
+
+7. **Clean Up**: Delete the feature branch after successful merge
+   ```bash
+   git branch -d feature/issue-name
+   git push origin --delete feature/issue-name
+   ```
+
+### Recent Development Session
+- Set up complete project structure from scratch
+- Implemented auto-title fetching with robust error handling
+- Created GitHub repository with initial release
+- Fixed dark mode default behavior
+- Identified and created GitHub issues for remaining features
