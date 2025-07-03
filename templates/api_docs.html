@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}API Documentation - StupidBookmarks{% endblock %}
+
+{% block nav_subtitle %}
+<span class="ml-2 text-sm text-gray-500 dark:text-gray-400">/ API Documentation</span>
+{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="border-b border-gray-200 dark:border-gray-700 pb-4 mb-6">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">API Documentation</h1>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Learn how to use the StupidBookmarks API
+        </p>
+    </div>
+
+    <div class="prose dark:prose-invert max-w-none prose-headings:text-gray-900 dark:prose-headings:text-gray-100 prose-p:text-gray-700 dark:prose-p:text-gray-300">
+        <!-- Interactive API docs -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">Interactive API Documentation</h2>
+            <p class="text-gray-700 dark:text-gray-300">
+                Try out the API directly using our interactive Swagger documentation:
+            </p>
+            <div class="mt-4">
+                <a href="/api/docs" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 focus:ring-offset-primary-200 text-white transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-md">
+                    Open Swagger UI
+                </a>
+            </div>
+        </div>
+
+        <!-- Authentication -->
+        <div class="mt-8 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Authentication</h2>
+            <p class="text-gray-700 dark:text-gray-300">
+                The StupidBookmarks API uses API key authentication. You need to include your API key in the
+                Authorization header of your requests using the Bearer token scheme.
+            </p>
+            
+            <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-md mt-4 border border-gray-200 dark:border-gray-700">
+                <h3 class="text-lg font-medium mb-2 text-gray-900 dark:text-white">Example</h3>
+                <pre class="bg-gray-50 dark:bg-gray-900 p-3 rounded border border-gray-200 dark:border-gray-700 overflow-x-auto"><code class="language-bash text-gray-800 dark:text-gray-200">curl -X GET "https://your-instance/api/bookmarks" \
+-H "Authorization: Bearer YOUR_API_KEY"</code></pre>
+            </div>
+            
+            <h3 class="text-lg font-medium mt-6 mb-2 text-gray-900 dark:text-white">Getting an API Key</h3>
+            <p class="text-gray-700 dark:text-gray-300">
+                You can generate API keys from the <a href="/admin" class="text-primary-600 dark:text-primary-400 hover:underline">Admin Dashboard</a>. 
+                Each API key has full access to your bookmarks, so keep them secure.
+            </p>
+        </div>
+
+        <!-- Available Endpoints -->
+        <div class="mt-8 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Available Endpoints</h2>
+            
+            <h3 class="text-lg font-medium mt-6 mb-2 text-gray-900 dark:text-white">List Bookmarks</h3>
+            <pre class="bg-gray-50 dark:bg-gray-900 p-3 rounded border border-gray-200 dark:border-gray-700 overflow-x-auto"><code class="language-http text-gray-800 dark:text-gray-200">GET /api/bookmarks</code></pre>
+            <p class="mt-2 text-gray-700 dark:text-gray-300">Optional query parameters:</p>
+            <ul class="list-disc list-inside mt-2 text-gray-700 dark:text-gray-300">
+                <li><code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-gray-800 dark:text-gray-200">tag</code> - Filter bookmarks by tag</li>
+                <li><code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-gray-800 dark:text-gray-200">limit</code> - Maximum number of bookmarks (default: 50)</li>
+                <li><code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-gray-800 dark:text-gray-200">offset</code> - Number of bookmarks to skip (default: 0)</li>
+            </ul>
+            
+            <h3 class="text-lg font-medium mt-6 mb-2 text-gray-900 dark:text-white">Create Bookmark</h3>
+            <pre class="bg-gray-50 dark:bg-gray-900 p-3 rounded border border-gray-200 dark:border-gray-700 overflow-x-auto"><code class="language-http text-gray-800 dark:text-gray-200">POST /api/bookmarks</code></pre>
+            <p class="mt-2 text-gray-700 dark:text-gray-300">Request body:</p>
+            <pre class="bg-gray-50 dark:bg-gray-900 p-3 rounded border border-gray-200 dark:border-gray-700 overflow-x-auto"><code class="language-json text-gray-800 dark:text-gray-200">{
+  "url": "https://example.com",
+  "title": "Example Website",  // Optional, auto-fetched if not provided
+  "description": "This is an example",  // Optional
+  "tags": "example tag1 tag2"  // Optional, space or comma separated
+}</code></pre>
+            
+            <h3 class="text-lg font-medium mt-6 mb-2 text-gray-900 dark:text-white">Delete Bookmark</h3>
+            <pre class="bg-gray-50 dark:bg-gray-900 p-3 rounded border border-gray-200 dark:border-gray-700 overflow-x-auto"><code class="language-http text-gray-800 dark:text-gray-200">DELETE /api/bookmarks/{bookmark_id}</code></pre>
+            
+            <h3 class="text-lg font-medium mt-6 mb-2 text-gray-900 dark:text-white">Get Tags</h3>
+            <pre class="bg-gray-50 dark:bg-gray-900 p-3 rounded border border-gray-200 dark:border-gray-700 overflow-x-auto"><code class="language-http text-gray-800 dark:text-gray-200">GET /api/tags</code></pre>
+            <p class="mt-2 text-gray-700 dark:text-gray-300">Returns tag cloud data with tag names, counts, and display sizes.</p>
+        </div>
+
+        <!-- Response Examples -->
+        <div class="mt-8 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Response Examples</h2>
+            
+            <h3 class="text-lg font-medium mt-6 mb-2 text-gray-900 dark:text-white">Bookmark Response</h3>
+            <pre class="bg-gray-50 dark:bg-gray-900 p-3 rounded border border-gray-200 dark:border-gray-700 overflow-x-auto"><code class="language-json text-gray-800 dark:text-gray-200">{
+  "id": 1,
+  "url": "https://example.com",
+  "title": "Example Website",
+  "description": "This is an example bookmark",
+  "tags": ["example", "demo", "test"],
+  "created_at": "2025-07-03T12:34:56.789Z",
+  "updated_at": "2025-07-03T12:34:56.789Z"
+}</code></pre>
+            
+            <h3 class="text-lg font-medium mt-6 mb-2 text-gray-900 dark:text-white">Tag Response</h3>
+            <pre class="bg-gray-50 dark:bg-gray-900 p-3 rounded border border-gray-200 dark:border-gray-700 overflow-x-auto"><code class="language-json text-gray-800 dark:text-gray-200">[
+  {
+    "name": "python",
+    "color": "#3776AB",
+    "count": 5,
+    "size": 22
+  },
+  {
+    "name": "javascript",
+    "color": "#F7DF1E",
+    "count": 3,
+    "size": 18
+  }
+]</code></pre>
+        </div>
+
+        <!-- Error Responses -->
+        <div class="mt-8 mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Error Responses</h2>
+            <p class="text-gray-700 dark:text-gray-300">The API uses standard HTTP status codes to indicate the success or failure of requests.</p>
+            
+            <h3 class="text-lg font-medium mt-6 mb-2 text-gray-900 dark:text-white">Common Error Codes</h3>
+            <ul class="list-disc list-inside mt-2 text-gray-700 dark:text-gray-300">
+                <li><code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-gray-800 dark:text-gray-200">401 Unauthorized</code> - Invalid or missing API key</li>
+                <li><code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-gray-800 dark:text-gray-200">404 Not Found</code> - Requested resource doesn't exist</li>
+                <li><code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-gray-800 dark:text-gray-200">422 Unprocessable Entity</code> - Validation error in request data</li>
+                <li><code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-gray-800 dark:text-gray-200">500 Internal Server Error</code> - Server error</li>
+            </ul>
+            
+            <h3 class="text-lg font-medium mt-6 mb-2 text-gray-900 dark:text-white">Error Response Format</h3>
+            <pre class="bg-gray-50 dark:bg-gray-900 p-3 rounded border border-gray-200 dark:border-gray-700 overflow-x-auto"><code class="language-json text-gray-800 dark:text-gray-200">{
+  "detail": "Error message explaining what went wrong"
+}</code></pre>
+        </div>
+
+        <!-- Rate Limits -->
+        <div class="mt-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Rate Limits</h2>
+            <p class="text-gray-700 dark:text-gray-300">
+                Currently, there are no rate limits enforced on API requests. However, please be considerate
+                with request frequency to ensure optimal performance.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
