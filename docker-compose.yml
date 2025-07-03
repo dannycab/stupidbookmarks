@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${PORT:-8000}:8000"
+    volumes:
+      - ./data:/app/data
+    env_file:
+      - .env
+    restart: unless-stopped
+    
+    # Uncomment the following to use PostgreSQL instead of SQLite
+    # depends_on:
+    #   - db
+  
+  # PostgreSQL database (optional - uncomment to use)
+  # db:
+  #   image: postgres:13-alpine
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   environment:
+  #     - POSTGRES_USER=stupidbookmarks
+  #     - POSTGRES_PASSWORD=stupidbookmarks
+  #     - POSTGRES_DB=stupidbookmarks
+  #   ports:
+  #     - "5432:5432"
+  #   restart: unless-stopped
+
+# Volumes for persistent data (used with PostgreSQL)
+# volumes:
+#   postgres_data:
