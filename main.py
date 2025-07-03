@@ -32,6 +32,10 @@ import secrets
 import hashlib
 from datetime import datetime
 from pydantic import BaseModel, Field, HttpUrl, validator
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 from models.database import get_db, init_db
 from models.models import User, Bookmark, Tag, APIKey, user_tags
@@ -592,4 +596,11 @@ async def api_delete_bookmark(
     return None
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8001, reload=True)
+    # Get host and port from environment variables, with fallback values
+    host = os.getenv("HOST", "0.0.0.0")
+    port = int(os.getenv("PORT", 8000))
+    
+    # Development mode with auto-reload
+    reload = os.getenv("ENVIRONMENT", "development").lower() != "production"
+    
+    uvicorn.run("main:app", host=host, port=port, reload=reload)

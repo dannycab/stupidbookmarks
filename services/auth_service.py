@@ -2,6 +2,7 @@
 
 import hashlib
 import secrets
+import os
 from typing import Optional
 from fastapi import Request, Response
 from sqlalchemy.orm import Session
@@ -31,8 +32,12 @@ class AuthService:
             return db.query(User).filter(User.id == user_id).first()
         return db.query(User).first()
     
-    def create_default_user(self, db: Session, password: str = "admin") -> User:
+    def create_default_user(self, db: Session, password: str = None) -> User:
         """Create the default admin user."""
+        if password is None:
+            # Use environment variable if available, otherwise fallback to "admin"
+            password = os.getenv("DEFAULT_ADMIN_PASSWORD", "admin")
+            
         hashed_password = self.hash_password(password)
         user = User(username="admin", password_hash=hashed_password)
         db.add(user)

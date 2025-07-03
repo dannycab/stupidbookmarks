@@ -10,3 +10,5 @@ httpx>=0.25.2
 beautifulsoup4>=4.12.2
 python-dotenv>=1.0.0
 requests>=2.31.0
+# Optional for PostgreSQL support
+psycopg2-binary>=2.9.9

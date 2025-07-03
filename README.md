@@ -52,7 +52,31 @@ A fast, minimalistic bookmark manager built with FastAPI and Tailwind CSS. Singl
 
 ## Docker Deployment
 
-Coming soon! Docker support will be added for easy deployment.
+1. **Setup environment variables**:
+   ```bash
+   cp env.example .env
+   # Edit .env with your custom settings
+   ```
+
+2. **Build and start the containers**:
+   ```bash
+   docker-compose up -d
+   ```
+
+3. **Access the application** at `http://localhost:8000`
+
+### Using PostgreSQL instead of SQLite
+
+By default, the application uses SQLite which is fine for small deployments.
+For larger deployments or production use, you can switch to PostgreSQL:
+
+1. Edit the `.env` file and uncomment the PostgreSQL DATABASE_URL
+2. Uncomment the PostgreSQL service in `docker-compose.yml`
+3. Restart the containers:
+   ```bash
+   docker-compose down
+   docker-compose up -d
+   ```
 
 ## API Usage
 
