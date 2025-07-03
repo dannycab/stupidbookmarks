@@ -5,10 +5,11 @@
 **StupidBookmarks** is a fast, minimalistic single-user bookmark manager built with FastAPI and Tailwind CSS. It's part of the "Stupid Apps" suite (alongside StupidRSS) and follows a "vibe coding" philosophy - freeform, improvisational, and experimental development style.
 
 ### Recent Updates
-- ✅ Completed Issues #3 and #4: Implemented StupidRSS-style colors and improved tag filter visibility
-- 🔄 Merged feature branch `feature/ui-improvements` into main
+- ✅ Completed Issue #1: Implemented Netscape HTML bookmark import/export functionality
+- ✅ Added pagination support for both main bookmark view and tag-filtered views
+- ✅ Implemented "Delete All Bookmarks" functionality with confirmation modal
+- 🔄 Merged feature branch `feature/netscape-bookmarks` into main
 - 🧹 Cleaned up branch structure by removing completed feature branch
-- 🎯 All UI styling improvements are now in the main codebase
 
 ### Key Features
 - 🔖 Single-user bookmark management with auto-title fetching
@@ -18,6 +19,8 @@
 - 🔑 API key system for external integrations
 - 📱 Mobile-responsive design
 - 🚀 FastAPI backend with async performance
+- 📄 Netscape HTML bookmark import/export functionality
+- 📃 Pagination system for browsing large collections of bookmarks
 
 ## Architecture
 
@@ -40,7 +43,8 @@ stupidbookmarks/
 │   ├── __init__.py
 │   ├── auth_service.py     # Authentication and user management
 │   ├── bookmark_service.py # Bookmark CRUD and title fetching
-│   └── api_service.py      # API key management and statistics
+│   ├── api_service.py      # API key management and statistics
+│   └── export_service.py   # Import/export functionality for bookmarks
 ├── templates/
 │   ├── base.html          # Base template with dark/light theme
 │   ├── login.html         # Login page

@@ -20,6 +20,8 @@
 - **Optimize Title Fetching**: Use async when appropriate, implement timeouts, handle failures gracefully
 - **Monitor Response Times**: Suggest performance improvements for slow endpoints
 - **Optimize Frontend**: Minimize DOM operations, use efficient CSS selectors, and lazy-load resources
+- **Pagination**: Implement and optimize pagination for large collections of bookmarks
+- **Import/Export**: Ensure efficient processing of large bookmark collections during import/export
 
 ### Security Best Practices
 - **Validate All Inputs**: Server-side validation for all user inputs
@@ -47,6 +49,21 @@
 - **Logging**: Use appropriate logging levels instead of print statements
 - **Comments**: Document complex logic, but prefer self-explanatory code
 - **Tests**: Suggest tests for critical functionality
+
+## Feature-Specific Guidelines
+
+### Pagination
+- **Consistent Experience**: Ensure pagination works consistently across all views (main, tag-filtered)
+- **Efficient Queries**: Use limit/offset for efficient database access
+- **Clear Navigation**: Provide intuitive navigation controls (prev/next, page numbers)
+- **State Preservation**: Maintain filter states when navigating between pages
+
+### Bookmark Import/Export
+- **Standard Formats**: Support standard bookmark formats (Netscape HTML)
+- **Error Handling**: Handle malformed input files gracefully
+- **Progress Feedback**: Provide user feedback for long-running operations
+- **Data Validation**: Validate imported data to ensure consistency
+- **Security**: Sanitize imported data to prevent XSS and other security issues
 
 ### Project-Specific Guidelines
 

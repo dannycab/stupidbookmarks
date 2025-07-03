@@ -21,6 +21,8 @@ A fast, minimalistic bookmark manager built with FastAPI and Tailwind CSS. Singl
 • 🌙 **Dark Mode**: Beautiful dark/light theme toggle  
 • 💾 **SQLite**: Lightweight, zero-config storage  
 • 📡 **REST API**: Full API for bookmark management  
+• 📄 **Import/Export**: Support for Netscape HTML bookmark format  
+• 📃 **Pagination**: Browse large bookmark collections with ease  
 
 ## Tech Stack
 
