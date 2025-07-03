@@ -15,11 +15,11 @@ RUN mkdir -p data
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-ENV PORT=8000
+ENV PORT=8002
 ENV HOST=0.0.0.0
 
 # Expose port
-EXPOSE 8000
+EXPOSE 8002
 
 # Start the application
-CMD ["python", "-m", "main"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002"]
