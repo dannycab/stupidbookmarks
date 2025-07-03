@@ -197,8 +197,19 @@ async def generate_api_key(
     if not user:
         return RedirectResponse(url="/login", status_code=302)
     
-    api_service.create_api_key(db, user.id, name)
-    return RedirectResponse(url="/admin", status_code=302)
+    new_api_key = api_service.create_api_key(db, user.id, name)
+    
+    # Get all API keys and pass the new one for display
+    stats = bookmark_service.get_statistics(db, user.id)
+    api_keys = api_service.get_api_keys(db, user.id)
+    
+    return templates.TemplateResponse("admin.html", {
+        "request": request,
+        "stats": stats,
+        "api_keys": api_keys,
+        "user": user,
+        "new_api_key": new_api_key  # Pass the new key with raw_key
+    })
 
 @app.post("/admin/api-keys/{key_id}/delete")
 async def delete_api_key(key_id: int, request: Request, db: Session = Depends(get_db)):

@@ -12,10 +12,28 @@
                 extend: {
                     colors: {
                         primary: {
-                            50: '#eff6ff',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8'
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12'
+                        },
+                        accent: {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            200: '#fecaca',
+                            300: '#fca5a5',
+                            400: '#f87171',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                            800: '#991b1b',
+                            900: '#7f1d1d'
                         }
                     }
                 }
@@ -30,8 +48,8 @@
 <body class="h-full bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
     <!-- Dark/Light mode toggle -->
     <script>
-        // Check for saved theme preference or default to light mode
-        const theme = localStorage.getItem('theme') || 'light';
+        // Default to dark mode, allow override from localStorage
+        const theme = localStorage.getItem('theme') || 'dark';
         if (theme === 'dark') {
             document.documentElement.classList.add('dark');
         }
@@ -64,10 +82,10 @@
                     
                     <div class="flex items-center space-x-4">
                         {% block nav_links %}
-                        <a href="/" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium">
+                        <a href="/" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                             Bookmarks
                         </a>
-                        <a href="/admin" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium">
+                        <a href="/admin" class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                             Admin
                         </a>
                         {% endblock %}
@@ -86,7 +104,7 @@
                             </svg>
                         </button>
                         
-                        <a href="/logout" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium">
+                        <a href="/logout" class="bg-accent-600 hover:bg-accent-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                             Logout
                         </a>
                     </div>
