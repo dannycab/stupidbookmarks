@@ -175,6 +175,15 @@ class BookmarkService:
             "updated_at": bookmark.updated_at.isoformat() if bookmark.updated_at else None
         }
     
+    def count_bookmarks(self, db: Session, user_id: int, tag_filter: Optional[str] = None) -> int:
+        """Count bookmarks with optional tag filtering."""
+        query = db.query(func.count(Bookmark.id)).filter(Bookmark.user_id == user_id)
+        
+        if tag_filter:
+            query = query.join(Bookmark.tags).filter(Tag.name == tag_filter)
+        
+        return query.scalar() or 0
+    
     def _fetch_page_title(self, url: str) -> Optional[str]:
         """Fetch page title from URL with multiple fallback strategies."""
         headers_list = [

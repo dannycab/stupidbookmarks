@@ -145,13 +145,31 @@ async def startup():
         db.close()
 
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request, tag: Optional[str] = None, db: Session = Depends(get_db)):
-    """Main bookmarks page with optional tag filtering."""
+async def index(
+    request: Request, 
+    tag: Optional[str] = None, 
+    page: int = 1,
+    db: Session = Depends(get_db)
+):
+    """Main bookmarks page with optional tag filtering and pagination."""
     user = auth_service.get_current_user(request, db)
     if not user:
         return RedirectResponse(url="/login", status_code=302)
     
-    bookmarks = bookmark_service.get_bookmarks(db, user.id, tag_filter=tag)
+    # Pagination configuration
+    page_size = 20  # Number of bookmarks per page - adjust this if you want more bookmarks per page
+    offset = (page - 1) * page_size if page > 0 else 0
+    
+    # Get bookmarks with pagination
+    bookmarks = bookmark_service.get_bookmarks(
+        db, user.id, tag_filter=tag, limit=page_size, offset=offset
+    )
+    
+    # Get total count for pagination
+    total_bookmarks = bookmark_service.count_bookmarks(db, user.id, tag_filter=tag)
+    total_pages = (total_bookmarks + page_size - 1) // page_size  # Ceiling division
+    
+    # Get tag cloud
     tags = bookmark_service.get_tag_cloud(db, user.id)
     
     return templates.TemplateResponse("index.html", {
@@ -159,7 +177,12 @@ async def index(request: Request, tag: Optional[str] = None, db: Session = Depen
         "bookmarks": bookmarks,
         "tags": tags,
         "current_tag": tag,
-        "user": user
+        "user": user,
+        "pagination": {
+            "current_page": page,
+            "total_pages": total_pages,
+            "total_bookmarks": total_bookmarks
+        }
     })
 
 @app.get("/login", response_class=HTMLResponse)
@@ -189,13 +212,25 @@ async def logout():
     return response
 
 @app.get("/tags/{tag_name}", response_class=HTMLResponse)
-async def tag_page(request: Request, tag_name: str, db: Session = Depends(get_db)):
-    """Show bookmarks for a specific tag."""
+async def tag_page(request: Request, tag_name: str, page: int = 1, db: Session = Depends(get_db)):
+    """Show bookmarks for a specific tag with pagination."""
     user = auth_service.get_current_user(request, db)
     if not user:
         return RedirectResponse(url="/login", status_code=302)
     
-    bookmarks = bookmark_service.get_bookmarks(db, user.id, tag_filter=tag_name)
+    # Pagination configuration
+    page_size = 20  # Number of bookmarks per page - same as main index
+    offset = (page - 1) * page_size if page > 0 else 0
+    
+    # Get bookmarks with pagination
+    bookmarks = bookmark_service.get_bookmarks(
+        db, user.id, tag_filter=tag_name, limit=page_size, offset=offset
+    )
+    
+    # Get total count for pagination
+    total_bookmarks = bookmark_service.count_bookmarks(db, user.id, tag_filter=tag_name)
+    total_pages = (total_bookmarks + page_size - 1) // page_size  # Ceiling division
+    
     tags = bookmark_service.get_tag_cloud(db, user.id)
     
     return templates.TemplateResponse("tag.html", {
@@ -203,7 +238,12 @@ async def tag_page(request: Request, tag_name: str, db: Session = Depends(get_db
         "bookmarks": bookmarks,
         "tags": tags,
         "tag_name": tag_name,
-        "user": user
+        "user": user,
+        "pagination": {
+            "current_page": page,
+            "total_pages": total_pages,
+            "total_bookmarks": total_bookmarks
+        }
     })
 
 @app.get("/admin", response_class=HTMLResponse)
