@@ -43,9 +43,12 @@ class BookmarkService:
         if not url.startswith(('http://', 'https://')):
             url = 'https://' + url
         
-        # Auto-fetch title if not provided
-        if not title.strip():
-            title = self._fetch_page_title(url) or "Untitled"
+        # Auto-fetch title if not provided or title is just whitespace
+        if not title or not title.strip():
+            print(f"Auto-fetching title for URL: {url}")  # Debug log
+            fetched_title = self._fetch_page_title(url)
+            title = fetched_title or "Untitled"
+            print(f"Fetched title: {title}")  # Debug log
         
         # Create bookmark
         bookmark = Bookmark(
@@ -158,18 +161,120 @@ class BookmarkService:
         }
     
     def _fetch_page_title(self, url: str) -> Optional[str]:
-        """Fetch page title from URL."""
-        try:
-            response = requests.get(url, timeout=5, headers={
-                'User-Agent': 'StupidBookmarks/1.0'
-            })
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.content, 'html.parser')
-                title_tag = soup.find('title')
-                if title_tag:
-                    return title_tag.get_text().strip()
-        except Exception:
-            pass
+        """Fetch page title from URL with multiple fallback strategies."""
+        headers_list = [
+            # Chrome on macOS
+            {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'DNT': '1',
+                'Connection': 'keep-alive',
+                'Upgrade-Insecure-Requests': '1',
+            },
+            # Firefox on macOS
+            {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:120.0) Gecko/20100101 Firefox/120.0',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'DNT': '1',
+                'Connection': 'keep-alive',
+                'Upgrade-Insecure-Requests': '1',
+            },
+            # Simple bot-friendly headers
+            {
+                'User-Agent': 'StupidBookmarks/1.0 (+https://github.com/dannycab/stupidbookmarks)',
+                'Accept': 'text/html,application/xhtml+xml',
+            }
+        ]
+        
+        for i, headers in enumerate(headers_list):
+            try:
+                print(f"Attempting to fetch title from: {url} (strategy {i+1}/{len(headers_list)})")
+                
+                # Use different timeouts for different strategies
+                timeout = 15 if i == 0 else (10 if i == 1 else 5)
+                
+                response = requests.get(
+                    url, 
+                    timeout=timeout, 
+                    headers=headers,
+                    allow_redirects=True,
+                    verify=True
+                )
+                
+                print(f"Response status: {response.status_code}")
+                
+                if response.status_code == 200:
+                    # Try different encodings if needed
+                    content = response.content
+                    if response.encoding:
+                        try:
+                            content = response.content.decode(response.encoding)
+                        except:
+                            content = response.content.decode('utf-8', errors='ignore')
+                    
+                    soup = BeautifulSoup(content, 'html.parser')
+                    
+                    # Try multiple ways to get the title
+                    title = None
+                    
+                    # 1. Standard <title> tag
+                    title_tag = soup.find('title')
+                    if title_tag and title_tag.get_text().strip():
+                        title = title_tag.get_text().strip()
+                        print(f"Found title in <title> tag: {title}")
+                    
+                    # 2. Open Graph title
+                    if not title:
+                        og_title = soup.find('meta', property='og:title')
+                        if og_title and og_title.get('content'):
+                            title = og_title['content'].strip()
+                            print(f"Found title in og:title: {title}")
+                    
+                    # 3. Twitter title
+                    if not title:
+                        twitter_title = soup.find('meta', attrs={'name': 'twitter:title'})
+                        if twitter_title and twitter_title.get('content'):
+                            title = twitter_title['content'].strip()
+                            print(f"Found title in twitter:title: {title}")
+                    
+                    # 4. First h1 tag
+                    if not title:
+                        h1_tag = soup.find('h1')
+                        if h1_tag and h1_tag.get_text().strip():
+                            title = h1_tag.get_text().strip()
+                            print(f"Found title in h1: {title}")
+                    
+                    if title:
+                        # Clean up the title
+                        title = ' '.join(title.split())  # Remove extra whitespace
+                        title = title.replace('\n', ' ').replace('\r', ' ')
+                        
+                        # Limit title length
+                        if len(title) > 200:
+                            title = title[:197] + "..."
+                        
+                        print(f"Successfully fetched title: {title}")
+                        return title
+                    else:
+                        print("No title found in any meta tags")
+                
+                print(f"Failed to fetch title: HTTP {response.status_code}")
+                
+            except requests.exceptions.Timeout:
+                print(f"Timeout fetching title (strategy {i+1})")
+                continue
+            except requests.exceptions.RequestException as e:
+                print(f"Request error fetching title (strategy {i+1}): {e}")
+                continue
+            except Exception as e:
+                print(f"Unexpected error fetching title (strategy {i+1}): {e}")
+                continue
+        
+        print("All title fetching strategies failed")
         return None
     
     def _add_tags_to_bookmark(self, db: Session, bookmark: Bookmark, tags_str: str, user_id: int):
