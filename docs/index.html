@@ -83,6 +83,18 @@
             margin-bottom: 1rem;
             display: inline-block;
         }
+        
+        .new-badge {
+            background-color: #10b981;
+            color: white;
+            padding: 0.15rem 0.5rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            display: inline-block;
+            vertical-align: middle;
+        }
 
         .buttons {
             display: flex;
@@ -556,6 +568,26 @@
                             </ul>
                         </div>
                     </div>
+                </div>
+
+                <div class="release-item">
+                    <div class="release-content">
+                        <div class="release-badge">New Feature</div>
+                        <h3 class="release-title">Docker Compose Support</h3>
+                        <p class="release-desc">
+                            Deploy StupidBookmarks anywhere with our new Docker Compose setup. Run with SQLite for simplicity or PostgreSQL for production environments.
+                        </p>
+                        <div class="release-features">
+                            <h4>What's Included</h4>
+                            <ul>
+                                <li>Dockerfile with multi-stage build for smaller images</li>
+                                <li>Docker Compose configuration for quick setup</li>
+                                <li>Environment variable support for configuration</li>
+                                <li>Database options: SQLite (default) or PostgreSQL</li>
+                                <li>Production-ready with secure defaults</li>
+                            </ul>
+                        </div>
+                    </div>
                     <div class="release-image">
                         <img src="https://placehold.co/800x450/3b82f6/FFF?text=Pagination+Support" alt="Pagination Support">
                     </div>
@@ -609,13 +641,37 @@
                     <h3 class="feature-title">Responsive</h3>
                     <p class="feature-desc">Works perfectly on desktop, tablet, and mobile devices.</p>
                 </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-copy"></i>
+                    </div>
+                    <h3 class="feature-title">Pagination <span class="new-badge">New</span></h3>
+                    <p class="feature-desc">Browse large bookmark collections with intuitive navigation controls.</p>
+                </div>
 
                 <div class="feature-item">
                     <div class="feature-icon">
                         <i class="fas fa-database"></i>
                     </div>
-                    <h3 class="feature-title">SQLite Database</h3>
-                    <p class="feature-desc">Lightweight, zero-config database for storing bookmarks and tags.</p>
+                    <h3 class="feature-title">Database Options</h3>
+                    <p class="feature-desc">SQLite for simplicity or PostgreSQL for production environments.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-import"></i>
+                    </div>
+                    <h3 class="feature-title">Import/Export <span class="new-badge">New</span></h3>
+                    <p class="feature-desc">Import and export bookmarks using Netscape HTML format.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fab fa-docker"></i>
+                    </div>
+                    <h3 class="feature-title">Docker <span class="new-badge">New</span></h3>
+                    <p class="feature-desc">Easy deployment with Docker Compose for any environment.</p>
                 </div>
 
                 <div class="feature-item">
@@ -707,15 +763,17 @@
 
             <div class="card">
                 <pre><code>
-# Clone the repository
+# Method 1: Standard Installation
 git clone https://github.com/dannycab/stupidbookmarks.git
 cd stupidbookmarks
-
-# Install dependencies
 pip install -r requirements.txt
-
-# Run the application
 python main.py
+
+# Method 2: Docker Compose (NEW!)
+git clone https://github.com/dannycab/stupidbookmarks.git
+cd stupidbookmarks
+cp env.example .env
+docker-compose up -d
 
 # Open your browser to the bookmark manager
 open http://localhost:8000/
