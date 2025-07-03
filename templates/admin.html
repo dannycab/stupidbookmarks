@@ -215,6 +215,274 @@
                 </div>
             </div>
         </div>
+
+        <!-- Import/Export -->
+        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg mt-5">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+                    Import & Export Bookmarks
+                </h3>
+                <div class="mt-2 max-w-xl text-sm text-gray-500 dark:text-gray-400">
+                    <p>Import or export your bookmarks in standard browser format.</p>
+                </div>
+                
+                <!-- Success message for import -->
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        if (urlParams.get('success') === 'bookmarks_imported') {
+                            const imported = parseInt(urlParams.get('imported') || '0');
+                            const skipped = parseInt(urlParams.get('skipped') || '0');
+                            
+                            const alert = document.createElement('div');
+                            alert.className = 'mt-4 mb-4 bg-green-50 dark:bg-green-900/50 border border-green-200 dark:border-green-800 rounded-md p-4';
+                            alert.innerHTML = `
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-green-800 dark:text-green-200">
+                                            Import successful! Added ${imported} bookmarks. Skipped ${skipped} items.
+                                        </p>
+                                    </div>
+                                </div>
+                            `;
+                            document.querySelector('.import-export-container').prepend(alert);
+                        } else if (urlParams.get('success') === 'bookmarks_deleted') {
+                            const count = parseInt(urlParams.get('count') || '0');
+                            
+                            const alert = document.createElement('div');
+                            alert.className = 'mt-4 mb-4 bg-blue-50 dark:bg-blue-900/50 border border-blue-200 dark:border-blue-800 rounded-md p-4';
+                            alert.innerHTML = `
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-blue-800 dark:text-blue-200">
+                                            Successfully deleted ${count} bookmarks.
+                                        </p>
+                                    </div>
+                                </div>
+                            `;
+                            document.querySelector('.import-export-container').prepend(alert);
+                        } else if (urlParams.get('error') === 'import_failed') {
+                            const message = urlParams.get('message') || 'Unknown error';
+                            
+                            const alert = document.createElement('div');
+                            alert.className = 'mt-4 mb-4 bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-800 rounded-md p-4';
+                            alert.innerHTML = `
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm text-red-800 dark:text-red-200">
+                                            Import failed: ${message}
+                                        </p>
+                                    </div>
+                                </div>
+                            `;
+                            document.querySelector('.import-export-container').prepend(alert);
+                        }
+                    });
+                </script>
+
+                <div class="mt-5 space-y-5 import-export-container">
+                    <!-- Export button -->
+                    <a 
+                        href="/admin/export/netscape" 
+                        download="bookmarks.html"
+                        class="w-full bg-primary-600 hover:bg-primary-700 text-white rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors duration-200"
+                        onclick="showExportProgress(event)"
+                        id="export-button"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Export Bookmarks (Netscape HTML)
+                    </a>
+                    
+                    <!-- Export Progress -->
+                    <div id="export-progress" class="hidden mt-3">
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div id="export-progress-bar" class="bg-primary-600 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1" id="export-status">Preparing export...</p>
+                    </div>
+                    
+                    <!-- Import form -->
+                    <form action="/admin/import/netscape" method="post" enctype="multipart/form-data" class="mt-4" id="import-form" onsubmit="return showImportProgress()">
+                        <div class="flex items-center">
+                            <label class="relative cursor-pointer bg-gray-50 dark:bg-gray-700 rounded-md font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500 overflow-hidden flex-grow">
+                                <span class="block text-center px-4 py-2" id="file-label">Choose HTML file...</span>
+                                <input id="bookmark-file" name="bookmark_file" type="file" class="sr-only" accept=".html,.htm" onchange="updateFileLabel(this)" required>
+                            </label>
+                            <button type="submit" class="ml-3 px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500" id="import-button">
+                                Import
+                            </button>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            Upload a Netscape HTML bookmark file exported from another browser
+                        </p>
+                    </form>
+                    
+                    <!-- Import Progress -->
+                    <div id="import-progress" class="hidden mt-3">
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div id="import-progress-bar" class="bg-primary-600 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1" id="import-status">Processing import...</p>
+                    </div>
+                    
+                    <!-- Delete All Bookmarks button -->
+                    <div class="mt-5 pt-5 border-t border-gray-200 dark:border-gray-700">
+                        <h4 class="text-md font-medium text-red-600 dark:text-red-400">Danger Zone</h4>
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            This action cannot be undone. It will permanently delete all bookmarks.
+                        </p>
+                        <button 
+                            onclick="confirmDeleteAll()" 
+                            class="mt-3 bg-red-600 hover:bg-red-700 text-white rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors duration-200"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Delete All Bookmarks
+                        </button>
+                    </div>
+                    
+                    <script>
+                        function updateFileLabel(input) {
+                            const label = document.getElementById('file-label');
+                            if (input.files.length > 0) {
+                                label.textContent = input.files[0].name;
+                            } else {
+                                label.textContent = 'Choose HTML file...';
+                            }
+                        }
+                        
+                        function showImportProgress() {
+                            const fileInput = document.getElementById('bookmark-file');
+                            if (fileInput.files.length === 0) return false;
+                            
+                            document.getElementById('import-form').classList.add('opacity-50', 'pointer-events-none');
+                            document.getElementById('import-button').disabled = true;
+                            document.getElementById('import-progress').classList.remove('hidden');
+                            
+                            // Simulate progress
+                            let progress = 0;
+                            const interval = setInterval(() => {
+                                progress += Math.random() * 15;
+                                if (progress > 90) {
+                                    progress = 90;
+                                    clearInterval(interval);
+                                }
+                                document.getElementById('import-progress-bar').style.width = progress + '%';
+                                document.getElementById('import-status').textContent = 'Importing bookmarks...';
+                            }, 500);
+                            
+                            return true;
+                        }
+                        
+                        function showExportProgress(event) {
+                            document.getElementById('export-progress').classList.remove('hidden');
+                            document.getElementById('export-button').classList.add('opacity-50', 'pointer-events-none');
+                            
+                            // Simulate progress
+                            let progress = 0;
+                            const interval = setInterval(() => {
+                                progress += 5;
+                                if (progress > 95) {
+                                    clearInterval(interval);
+                                }
+                                document.getElementById('export-progress-bar').style.width = `${progress}%`;
+                                document.getElementById('export-status').textContent = `Exporting bookmarks... ${progress}%`;
+                            }, 100);
+                            
+                            // Re-enable button after 3 seconds
+                            setTimeout(() => {
+                                document.getElementById('export-button').classList.remove('opacity-50', 'pointer-events-none');
+                                document.getElementById('export-progress-bar').style.width = '100%';
+                                document.getElementById('export-status').textContent = 'Export complete!';
+                            }, 3000);
+                        }
+                        
+                        function confirmDeleteAll() {
+                            // Create and show modal
+                            const modal = document.createElement('div');
+                            modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4';
+                            modal.id = 'delete-modal';
+                            
+                            modal.innerHTML = `
+                                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
+                                    <h3 class="text-lg font-medium text-red-600 dark:text-red-500 mb-3">
+                                        ⚠️ Delete All Bookmarks
+                                    </h3>
+                                    <p class="text-gray-700 dark:text-gray-300 mb-4">
+                                        This action cannot be undone. All your bookmarks will be permanently deleted.
+                                    </p>
+                                    <p class="text-gray-700 dark:text-gray-300 mb-4">
+                                        To confirm, please type <strong>DELETE</strong> in the field below:
+                                    </p>
+                                    <input type="text" id="confirm-text" placeholder="Type DELETE to confirm" 
+                                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 dark:bg-gray-700 dark:text-white mb-4">
+                                    <div class="flex justify-end space-x-3">
+                                        <button id="cancel-delete" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                            Cancel
+                                        </button>
+                                        <button id="confirm-delete" disabled class="px-4 py-2 bg-red-600 text-white rounded-md opacity-50 cursor-not-allowed">
+                                            Delete All
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            document.body.appendChild(modal);
+                            
+                            // Add event listeners
+                            const confirmInput = document.getElementById('confirm-text');
+                            const confirmButton = document.getElementById('confirm-delete');
+                            const cancelButton = document.getElementById('cancel-delete');
+                            
+                            // Enable button only when text is exactly "DELETE"
+                            confirmInput.addEventListener('input', function() {
+                                if (this.value === "DELETE") {
+                                    confirmButton.disabled = false;
+                                    confirmButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                                } else {
+                                    confirmButton.disabled = true;
+                                    confirmButton.classList.add('opacity-50', 'cursor-not-allowed');
+                                }
+                            });
+                            
+                            // Cancel button closes modal
+                            cancelButton.addEventListener('click', function() {
+                                document.body.removeChild(modal);
+                            });
+                            
+                            // Confirm button submits form
+                            confirmButton.addEventListener('click', function() {
+                                if (confirmInput.value === "DELETE") {
+                                    // Create and submit form programmatically
+                                    const form = document.createElement('form');
+                                    form.method = 'POST';
+                                    form.action = '/admin/bookmarks/delete-all';
+                                    document.body.appendChild(form);
+                                    form.submit();
+                                }
+                            });
+                        }
+                    </script>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- API Keys Section -->

@@ -1,4 +1,17 @@
-#!/usr/bin/env python3
+#!/usr/bimport os
+from fastapi import FastAPI, Request, Depends, HTTPException, Form, status, File, UploadFile
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse, RedirectResponse, FileResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from sqlalchemy.orm import Session
+import uvicorn
+from typing import Optional, List, Dict, Any
+import secrets
+import hashlib
+from datetime import datetime
+import io
+from pydantic import BaseModel, Field, HttpUrl, validator
 """
 StupidBookmarks - A fast, minimalistic bookmark manager built with FastAPI and Tailwind CSS.
 
@@ -7,7 +20,7 @@ This project is developed in a freeform, improvisational, and experimental style
 """
 
 import os
-from fastapi import FastAPI, Request, Depends, HTTPException, Form, status
+from fastapi import FastAPI, Request, Depends, HTTPException, Form, status, UploadFile, File
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -25,6 +38,7 @@ from models.models import User, Bookmark, Tag, APIKey, user_tags
 from services.bookmark_service import BookmarkService
 from services.auth_service import AuthService
 from services.api_service import APIService
+from services.export_service import BookmarkExportService
 import version
 
 # Initialize FastAPI app
@@ -112,6 +126,7 @@ class BookmarkResponse(BaseModel):
 bookmark_service = BookmarkService()
 auth_service = AuthService()
 api_service = APIService()
+export_service = BookmarkExportService()
 
 # Security
 security = HTTPBearer(auto_error=False)
@@ -207,6 +222,69 @@ async def admin_page(request: Request, db: Session = Depends(get_db)):
         "api_keys": api_keys,
         "user": user
     })
+
+@app.get("/admin/export/netscape", response_class=HTMLResponse)
+async def export_bookmarks_netscape(request: Request, db: Session = Depends(get_db)):
+    """Export bookmarks in Netscape HTML format."""
+    user = auth_service.get_current_user(request, db)
+    if not user:
+        return RedirectResponse(url="/login", status_code=302)
+    
+    html_content = export_service.export_netscape_html(db, user.id)
+    
+    headers = {
+        "Content-Disposition": f"attachment; filename=bookmarks_{datetime.now().strftime('%Y%m%d')}.html"
+    }
+    
+    return HTMLResponse(content=html_content, headers=headers)
+
+@app.post("/admin/import/netscape")
+async def import_bookmarks_netscape(
+    request: Request,
+    bookmark_file: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
+    """Import bookmarks from Netscape HTML format."""
+    try:
+        print(f"Received file upload: {bookmark_file.filename}, content type: {bookmark_file.content_type}")
+        
+        user = auth_service.get_current_user(request, db)
+        if not user:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        
+        content = await bookmark_file.read()
+        print(f"Read {len(content)} bytes from uploaded file")
+        
+        # Try to detect encoding, fallback to utf-8
+        try:
+            html_content = content.decode("utf-8")
+        except UnicodeDecodeError:
+            print("UTF-8 decoding failed, trying with ISO-8859-1")
+            html_content = content.decode("ISO-8859-1")
+        
+        print(f"Decoded HTML content, length: {len(html_content)}")
+        
+        # Print first 100 chars to verify content
+        print(f"Content preview: {html_content[:100]}...")
+        
+        result = export_service.import_netscape_html(db, user.id, html_content)
+        
+        # Log the result
+        print(f"Import result: {result}")
+        
+        return RedirectResponse(
+            url=f"/admin?success=bookmarks_imported&imported={result['imported']}&skipped={result['skipped']}",
+            status_code=302
+        )
+    except Exception as e:
+        print(f"Error in import endpoint: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        
+        return RedirectResponse(
+            url=f"/admin?error=import_failed&message={str(e)}",
+            status_code=302
+        )
 
 # Human-friendly API documentation
 @app.get("/api/docs/help", response_class=HTMLResponse)
@@ -304,6 +382,23 @@ async def delete_api_key(key_id: int, request: Request, db: Session = Depends(ge
     
     api_service.delete_api_key(db, key_id, user.id)
     return RedirectResponse(url="/admin", status_code=302)
+
+@app.post("/admin/bookmarks/delete-all")
+async def delete_all_bookmarks(
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    """Delete all bookmarks for the current user."""
+    user = auth_service.get_current_user(request, db)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    deleted_count = bookmark_service.delete_all_bookmarks(db, user.id)
+    
+    return RedirectResponse(
+        url=f"/admin?success=bookmarks_deleted&count={deleted_count}",
+        status_code=302
+    )
 
 # API routes
 @app.get(

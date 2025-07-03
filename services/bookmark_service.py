@@ -82,6 +82,21 @@ class BookmarkService:
             return True
         return False
     
+    def delete_all_bookmarks(self, db: Session, user_id: int) -> int:
+        """Delete all bookmarks for a user.
+        
+        Returns:
+            int: Number of bookmarks deleted
+        """
+        # Get the count before deletion for return value
+        bookmark_count = db.query(Bookmark).filter(Bookmark.user_id == user_id).count()
+        
+        # Delete all bookmarks for the user
+        db.query(Bookmark).filter(Bookmark.user_id == user_id).delete()
+        db.commit()
+        
+        return bookmark_count
+    
     def get_tag_cloud(self, db: Session, user_id: int) -> List[Dict[str, Any]]:
         """Get tag cloud with bookmark counts."""
         tag_counts = (
